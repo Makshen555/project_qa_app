@@ -1,4 +1,4 @@
-# QA Secure Web Application – Blue Team
+# QA Secure Web Application
 
 ## Descripción del Proyecto
 
