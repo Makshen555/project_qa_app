@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <%- include("../partials/head", { title: "Detalle Producto" }) %>
+</head>
+<body>
+  <div class="app-shell">
+    <%- include("../partials/sidebar", { user }) %>
+
+    <div class="main-content">
+      <%- include("../partials/navbar", { user, csrfToken }) %>
+
+      <main class="page-content">
+        <h2>Detalle del Producto</h2>
+
+        <div class="card">
+          <p><strong>ID:</strong> <%= product.id %></p>
+          <p><strong>Código:</strong> <%= product.code %></p>
+          <p><strong>Nombre:</strong> <%= product.name %></p>
+          <p><strong>Descripción:</strong> <%= product.description %></p>
+          <p><strong>Cantidad:</strong> <%= product.quantity %></p>
+          <p><strong>Precio:</strong> ₡ <%= product.price %></p>
+        </div>
+
+        <div style="margin-top: 20px;">
+          <a href="/products" class="btn btn-primary">Volver</a>
+
+          <% if (user.role !== "AUDITOR") { %>
+            <a href="/products/<%= product.id %>/edit" class="btn btn-primary">
+              Editar
+            </a>
+          <% } %>
+        </div>
+      </main>
+
+      <%- include("../partials/footer") %>
+    </div>
+  </div>
+</body>
+</html>

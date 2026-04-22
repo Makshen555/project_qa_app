@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <%- include("../partials/head", { title: title || "QA Secure App" }) %>
+</head>
+<body>
+  <div class="app-shell">
+    <% if (user) { %>
+      <%- include("../partials/sidebar", { user }) %>
+    <% } %>
+
+    <div class="main-content">
+      <% if (user) { %>
+        <%- include("../partials/navbar", { user, csrfToken }) %>
+      <% } %>
+
+      <main class="page-content">
+        <%- body %>
+      </main>
+
+      <%- include("../partials/footer") %>
+    </div>
+  </div>
+</body>
+</html>

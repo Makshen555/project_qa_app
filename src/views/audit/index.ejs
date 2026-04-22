@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <%- include("../partials/head", { title: "Auditoría" }) %>
+</head>
+<body>
+  <div class="app-shell">
+    <%- include("../partials/sidebar", { user }) %>
+
+    <div class="main-content">
+      <%- include("../partials/navbar", { user, csrfToken }) %>
+
+      <main class="page-content">
+        <h2>Log de Auditoría</h2>
+        <p>Eventos de seguridad registrados por el sistema.</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Acción</th>
+              <th>Entidad</th>
+              <th>ID Entidad</th>
+              <th>Usuario</th>
+              <th>IP</th>
+              <th>Detalles</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% logs.forEach(log => { %>
+              <tr>
+                <td><%= log.id %></td>
+                <td><%= log.action %></td>
+                <td><%= log.entity %></td>
+                <td><%= log.entityId || "-" %></td>
+                <td><%= log.user?.email || "SYSTEM" %></td>
+                <td><%= log.ipAddress %></td>
+                <td><%= log.details || "-" %></td>
+                <td><%= new Date(log.createdAt).toLocaleString() %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </main>
+
+      <%- include("../partials/footer") %>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <%- include("../partials/head", { title: "401 - No autenticado" }) %>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-card">
+      <h1>401</h1>
+      <p>No has iniciado sesión o tu sesión ya no es válida.</p>
+
+      <% if (typeof message !== "undefined" && message) { %>
+        <div class="alert alert-error">
+          <%= message %>
+        </div>
+      <% } %>
+
+      <div style="margin-top: 20px;">
+        <a href="/login" class="btn btn-primary">Ir al login</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

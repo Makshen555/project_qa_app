@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <%- include("../partials/head", { title: "Dashboard SuperAdmin" }) %>
+</head>
+<body>
+  <div class="app-shell">
+    <%- include("../partials/sidebar", { user }) %>
+
+    <div class="main-content">
+      <%- include("../partials/navbar", { user, csrfToken }) %>
+
+      <main class="page-content">
+        <h2>Dashboard - SuperAdmin</h2>
+        <p>Bienvenido. Desde aquí puedes supervisar el sistema completo.</p>
+
+        <div class="grid">
+          <div class="card">
+            <h3>Logs</h3>
+            <p><%= stats.logsCount %></p>
+          </div>
+
+          <div class="card">
+            <h3>Usuarios</h3>
+            <p><%= stats.usersCount %></p>
+          </div>
+
+          <div class="card">
+            <h3>Productos</h3>
+            <p><%= stats.productsCount %></p>
+          </div>
+        </div>
+
+        <h3 style="margin-top: 30px;">Últimos eventos de auditoría</h3>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Acción</th>
+              <th>Entidad</th>
+              <th>Usuario</th>
+              <th>IP</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% logs.forEach(log => { %>
+              <tr>
+                <td><%= log.action %></td>
+                <td><%= log.entity %></td>
+                <td><%= log.user?.email || "SYSTEM" %></td>
+                <td><%= log.ipAddress %></td>
+                <td><%= new Date(log.createdAt).toLocaleString() %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </main>
+
+      <%- include("../partials/footer") %>
+    </div>
+  </div>
+</body>
+</html>

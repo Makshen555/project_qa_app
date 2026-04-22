@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <%- include("../partials/head", { title: "Dashboard Auditor" }) %>
+</head>
+<body>
+  <div class="app-shell">
+    <%- include("../partials/sidebar", { user }) %>
+
+    <div class="main-content">
+      <%- include("../partials/navbar", { user, csrfToken }) %>
+
+      <main class="page-content">
+        <h2>Dashboard - Auditor</h2>
+        <p>Bienvenido. Desde aquí puedes consultar información del sistema en modo lectura.</p>
+
+        <div class="grid">
+          <div class="card">
+            <h3>Usuarios</h3>
+            <p><%= stats.usersCount %></p>
+          </div>
+
+          <div class="card">
+            <h3>Productos</h3>
+            <p><%= stats.productsCount %></p>
+          </div>
+        </div>
+
+        <div style="margin-top: 24px; display: flex; gap: 12px;">
+          <a href="/users" class="btn btn-primary">Ver usuarios</a>
+          <a href="/products" class="btn btn-primary">Ver productos</a>
+        </div>
+      </main>
+
+      <%- include("../partials/footer") %>
+    </div>
+  </div>
+</body>
+</html>

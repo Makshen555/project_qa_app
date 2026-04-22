@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <%- include("../partials/head", { title: "Usuarios" }) %>
+</head>
+<body>
+  <div class="app-shell">
+    <%- include("../partials/sidebar", { user }) %>
+
+    <div class="main-content">
+      <%- include("../partials/navbar", { user, csrfToken }) %>
+
+      <main class="page-content">
+        <h2>Gestión de Usuarios</h2>
+        <p>Listado de usuarios del sistema.</p>
+
+        <% if (canCreate) { %>
+          <div style="margin-bottom: 16px;">
+            <a href="/users/create" class="btn btn-primary">Crear usuario</a>
+          </div>
+        <% } %>
+
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Rol</th>
+              <th>Permisos</th>
+              <th>Último login</th>
+              <% if (canManage) { %>
+                <th>Acciones</th>
+              <% } %>
+            </tr>
+          </thead>
+          <tbody>
+            <% users.forEach(u => { %>
+              <tr>
+                <td><%= u.id %></td>
+                <td><%= u.username %></td>
+                <td><%= u.email %></td>
+                <td><%= u.role %></td>
+                <td><%= u.permissions %></td>
+                <td><%= u.lastLogin ? new Date(u.lastLogin).toLocaleString() : "Nunca" %></td>
+
+                <% if (canManage) { %>
+                  <td style="display:flex; gap:8px;">
+                    <a href="/users/<%= u.id %>/edit" class="btn btn-primary">Editar</a>
+
+                    <form method="POST" action="/users/<%= u.id %>/delete" style="display:inline;">
+                      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                      <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </form>
+                  </td>
+                <% } %>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </main>
+
+      <%- include("../partials/footer") %>
+    </div>
+  </div>
+</body>
+</html>

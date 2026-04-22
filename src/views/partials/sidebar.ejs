@@ -1,0 +1,25 @@
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <h2>Menú</h2>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a href="/dashboard">Dashboard</a>
+
+    <% if (user.role === "SUPERADMIN") { %>
+      <a href="/users">Usuarios</a>
+      <a href="/products">Productos</a>
+      <a href="/audit">Auditoría</a>
+    <% } %>
+
+    <% if (user.role === "REGISTRADOR") { %>
+      <a href="/products">Productos</a>
+      <a href="/users">Usuarios</a>
+    <% } %>
+
+    <% if (user.role === "AUDITOR") { %>
+      <a href="/products">Productos</a>
+      <a href="/users">Usuarios</a>
+    <% } %>
+  </nav>
+</aside>

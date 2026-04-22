@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <%- include("../partials/head", { title: "Dashboard Registrador" }) %>
+</head>
+<body>
+  <div class="app-shell">
+    <%- include("../partials/sidebar", { user }) %>
+
+    <div class="main-content">
+      <%- include("../partials/navbar", { user, csrfToken }) %>
+
+      <main class="page-content">
+        <h2>Dashboard - Registrador</h2>
+        <p>Bienvenido. Desde aquí puedes gestionar productos y consultar usuarios.</p>
+
+        <div class="grid">
+          <div class="card">
+            <h3>Productos registrados</h3>
+            <p><%= stats.productsCount %></p>
+          </div>
+        </div>
+
+        <div style="margin-top: 24px;">
+          <a href="/products" class="btn btn-primary">Ir a productos</a>
+        </div>
+      </main>
+
+      <%- include("../partials/footer") %>
+    </div>
+  </div>
+</body>
+</html>

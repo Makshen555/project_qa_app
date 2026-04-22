@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <%- include("../partials/head", { title: "500 - Error interno" }) %>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-card">
+      <h1>500</h1>
+      <p>Ocurrió un error interno en el servidor.</p>
+
+      <% if (typeof message !== "undefined" && message) { %>
+        <div class="alert alert-error">
+          <%= message %>
+        </div>
+      <% } %>
+
+      <div style="margin-top: 20px;">
+        <a href="/dashboard" class="btn btn-primary">Volver al dashboard</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

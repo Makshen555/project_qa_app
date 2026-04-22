@@ -1,0 +1,16 @@
+<header class="navbar">
+  <div class="navbar-left">
+    <h1 class="app-title">QA Secure App</h1>
+  </div>
+
+  <div class="navbar-right">
+    <span class="user-badge">
+      Rol: <strong><%= user.role %></strong>
+    </span>
+
+    <form method="POST" action="/logout" class="logout-form">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <button type="submit" class="btn btn-danger">Cerrar sesión</button>
+    </form>
+  </div>
+</header>
