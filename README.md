@@ -2,7 +2,7 @@
 
 ## Descripción del Proyecto
 
-Este proyecto corresponde a la **Fase 1 (Blue Team)** y consiste en el desarrollo de una aplicación web segura enfocada en la implementación de controles de seguridad modernos.
+Este proyecto consiste en el desarrollo de una aplicación web segura enfocada en la implementación de controles de seguridad modernos.
 
 El sistema permite la gestión de **usuarios y productos** mediante una arquitectura basada en:
 
