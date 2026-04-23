@@ -59,7 +59,7 @@ El sistema está compuesto por:
 ### 1. Clonar el repositorio
 
 ```bash
-git clone <repo>
+git clone <https://github.com/Makshen555/project_qa_app>
 cd project_qa_app
 ```
 
