@@ -220,38 +220,344 @@ http://localhost:8080
 
 ---
 
-## Endpoints Principales
+## Endpoints de la API
 
-### Auth
+La API REST expone endpoints para autenticación, gestión de usuarios, gestión de productos y auditoría.
 
-- `POST /api/auth/login`  
-- `GET /api/auth/csrf-token`  
-
----
-
-### Usuarios
-
-- `GET /api/users`  
-- `POST /api/users`  
-- `PUT /api/users/:id`  
-- `DELETE /api/users/:id`  
+Todas las rutas protegidas requieren autenticación mediante JWT en cookies HttpOnly.  
+Las operaciones de escritura (`POST`, `PUT`, `DELETE`) requieren además un token CSRF válido.
 
 ---
 
-### Productos
+## Autenticación
 
-- `GET /api/products`  
-- `POST /api/products`  
-- `PUT /api/products/:id`  
-- `DELETE /api/products/:id`  
+### Obtener token CSRF
 
----
+**Método:** `GET`  
+**Ruta:** `/api/auth/csrf-token`
 
-### Auditoría
+Obtiene el token CSRF necesario para realizar peticiones protegidas.
 
-- `GET /api/audit` (solo SUPERADMIN)  
+**Response:**
 
----
+```json
+{
+  "csrfToken": "string"
+}
+```
+
+### Login
+
+**Método:** `POST`  
+**Ruta:** `/api/auth/login`
+
+Permite autenticar un usuario en el sistema.
+
+**Headers:**
+
+```http
+Content-Type: application/json
+x-csrf-token: <csrfToken>
+```
+
+**Body:**
+
+```json
+{
+  "email": "admin@test.com",
+  "password": "Admin123*"
+}
+```
+
+**Body:**
+
+```json
+{
+  "message": "Login exitoso",
+  "user": {
+    "id": 1,
+    "email": "admin@test.com",
+    "role": "SUPERADMIN"
+  }
+}
+```
+
+## Usuarios
+
+### Listar usuarios
+
+**Método:** `GET`  
+**Ruta:** `/api/users`
+
+**Roles permitidos:**
+- SUPERADMIN
+- AUDITOR
+- REGISTRADOR
+
+**Response:**
+
+```json
+[
+  {
+    "id": 1,
+    "username": "admin",
+    "email": "admin@test.com",
+    "role": "SUPERADMIN",
+    "permissions": "SUPERADMIN",
+    "lastLogin": "2026-04-22T10:00:00.000Z"
+  }
+]
+```
+
+### Crear usuario
+
+**Método:** `POST`  
+**Ruta:** `/api/users`
+
+**Roles permitidos:**
+- SUPERADMIN
+
+**Headers:**
+
+```http
+Content-Type: application/json
+x-csrf-token: <csrfToken>
+```
+
+**Response:**
+
+```json
+[
+  {
+    "id": 1,
+    "username": "admin",
+    "email": "admin@test.com",
+    "role": "SUPERADMIN",
+    "permissions": "SUPERADMIN",
+    "lastLogin": "2026-04-22T10:00:00.000Z"
+  }
+]
+```
+
+**Comportamiento:**
+
+- La contraseña se almacena con bcrypt.
+- Se registra el evento `CREATE_USER` en auditoría.
+
+### Actualizar usuario
+
+**Método:** `PUT`  
+**Ruta:** `/api/users/:id`
+
+**Roles permitidos:**
+- SUPERADMIN
+
+**Headers:**
+
+```http
+Content-Type: application/json
+x-csrf-token: <csrfToken>
+```
+
+**Response:**
+
+```json
+{
+  "username": "usuario_actualizado",
+  "email": "actualizado@test.com",
+  "roleId": 3
+}
+```
+
+**Comportamiento:**
+
+- Si se cambia el rol, se registra `ROLE_CHANGE`.
+- Se registra el evento `UPDATE_USER`.
+
+### Eliminar usuario
+
+**Método:** `DELETE`  
+**Ruta:** `/api/users/:id`  
+
+**Roles permitidos:**
+- SUPERADMIN  
+
+**Headers:**
+```http
+x-csrf-token: <csrfToken>
+```
+
+**Comportamiento:**
+
+- Elimina el usuario indicado.
+- Registra el evento `DELETE_USER`.
+
+## Productos
+
+### Listar productos
+
+**Método:** `GET`
+**Ruta:** `/api/products`
+
+**Roles permitidos:**
+
+- SUPERADMIN
+- REGISTRADOR
+- AUDITOR
+
+**Response:**
+
+```json
+[
+  {
+    "id": 1,
+    "code": "P001",
+    "name": "Teclado",
+    "description": "Teclado mecánico",
+    "quantity": 10,
+    "price": 25000,
+    "createdAt": "2026-04-22T10:00:00.000Z",
+    "updatedAt": "2026-04-22T10:00:00.000Z"
+  }
+]
+```
+
+### Crear producto
+
+**Método:** `POST`
+**Ruta:** `/api/products`
+
+**Roles permitidos:**
+
+- SUPERADMIN
+- REGISTRADOR
+
+**Headers:**
+
+```http
+Content-Type: application/json
+x-csrf-token: <csrfToken>
+```
+
+Body:
+
+```json
+{
+  "code": "P001",
+  "name": "Teclado",
+  "description": "Teclado mecánico",
+  "quantity": 10,
+  "price": 25000
+}
+```
+**Comportamiento:**
+
+- Valida campos obligatorios.
+- Valida cantidad y precio.
+- Registra el evento `REATE_PRODUCT`.
+
+### Actualizar producto
+
+**Método:** `PUT`
+**Ruta:** `/api/products/:id`
+
+**Roles permitidos:**
+
+- SUPERADMIN
+- REGISTRADOR
+
+**Headers:**
+
+```http
+Content-Type: application/json
+x-csrf-token: <csrfToken>
+```
+
+**Body:**
+
+```json
+{
+  "code": "P001",
+  "name": "Teclado actualizado",
+  "description": "Teclado mecánico RGB",
+  "quantity": 15,
+  "price": 30000
+}
+```
+
+**Comportamiento:**
+
+- Actualiza el producto indicado.
+- Registra el evento `UPDATE_PRODUCT`.
+
+### Eliminar producto
+
+**Método:** `DELETE`
+**Ruta:** `/api/products/:id`
+
+**Roles permitidos:**
+
+- SUPERADMIN
+
+**Headers:**
+```http
+x-csrf-token: <csrfToken>
+```
+
+**Comportamiento:**
+
+- Elimina el producto indicado.
+- Registra el evento `DELETE_PRODUCT`.
+
+## Auditoría
+### Ver logs de auditoría
+
+**Método:** `GET`
+**Ruta:** `/api/audit`
+
+**Roles permitidos:**
+
+- SUPERADMIN
+
+**Response:**
+
+```json
+[
+  {
+    "id": 1,
+    "userId": 1,
+    "action": "LOGIN_SUCCESS",
+    "entity": "Auth",
+    "entityId": null,
+    "ipAddress": "127.0.0.1",
+    "details": null,
+    "createdAt": "2026-04-22T10:00:00.000Z"
+  }
+]
+```
+
+## Consideraciones de Seguridad en la API
+- Las rutas protegidas requieren JWT válido.
+- El JWT se almacena en cookie HttpOnly.
+- No se utiliza localStorage para almacenar tokens.
+- Las operaciones de escritura requieren token CSRF.
+- Las consultas a base de datos se realizan con Prisma ORM.
+- El sistema registra eventos críticos en auditoría.
+- El login bloquea temporalmente tras 5 intentos fallidos.
+
+## Flujo recomendado de prueba en Postman
+1. Ejecutar `GET /api/auth/csrf-token`.
+2. Copiar el valor de `csrfToken`.
+3. Ejecutar `POST /api/auth/login` enviando el header:
+```http
+x-csrf-token: <csrfToken>
+```
+4. Verificar que Postman conserve las cookies.
+5. Consumir endpoints protegidos.
+6. Para operaciones `POST`, `PUT` y `DELETE`, enviar siempre el header:
+```http
+x-csrf-token: <csrfToken>
+```
 
 ## Pruebas de Seguridad Realizadas
 
