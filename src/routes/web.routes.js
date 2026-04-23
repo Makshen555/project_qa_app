@@ -6,6 +6,10 @@ import { webAuthMiddleware } from "../middlewares/webAuth.middleware.js";
 
 const router = Router();
 
+router.get("/", (req, res) => {
+  res.redirect("/login");
+});
+
 router.get("/login", csrfProtection, (req, res) => {
   res.render("auth/login", {
     csrfToken: req.csrfToken(),

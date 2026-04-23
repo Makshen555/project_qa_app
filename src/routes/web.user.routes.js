@@ -52,39 +52,6 @@ router.get(
 );
 
 router.get(
-  "/users/:id",
-  webAuthMiddleware,
-  sessionTimeoutMiddleware,
-  roleWebMiddleware(["SUPERADMIN", "AUDITOR", "REGISTRADOR"]),
-  csrfProtection,
-  async (req, res) => {
-    try {
-      const targetUser = await prisma.user.findUnique({
-        where: { id: Number(req.params.id) },
-        include: { role: true },
-      });
-
-      if (!targetUser) {
-        return res.status(404).render("errors/404", {
-          message: "Usuario no encontrado",
-        });
-      }
-
-      return res.render("users/show", {
-        user: req.user,
-        csrfToken: req.csrfToken(),
-        targetUser,
-      });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).render("errors/500", {
-        message: "Error cargando detalle del usuario",
-      });
-    }
-  }
-);
-
-router.get(
   "/users/create",
   webAuthMiddleware,
   sessionTimeoutMiddleware,
@@ -158,8 +125,16 @@ router.get(
   csrfProtection,
   async (req, res) => {
     try {
+      const userId = Number(req.params.id);
+
+      if (Number.isNaN(userId)) {
+        return res.status(404).render("errors/404", {
+          message: "Usuario no encontrado",
+        });
+      }
+
       const editableUser = await prisma.user.findUnique({
-        where: { id: Number(req.params.id) },
+        where: { id: userId },
       });
 
       if (!editableUser) {
@@ -216,7 +191,7 @@ router.post(
         entity: "User",
         entityId: Number(req.params.id),
         ipAddress,
-        details: `Usuario actualizado desde interfaz web`,
+        details: "Usuario actualizado desde interfaz web",
       });
 
       if (oldUser && Number(oldUser.roleId) !== Number(roleId)) {
@@ -278,6 +253,47 @@ router.post(
       console.error(error);
       return res.status(400).render("errors/500", {
         message: "Error eliminando usuario",
+      });
+    }
+  }
+);
+
+router.get(
+  "/users/:id",
+  webAuthMiddleware,
+  sessionTimeoutMiddleware,
+  roleWebMiddleware(["SUPERADMIN", "AUDITOR", "REGISTRADOR"]),
+  csrfProtection,
+  async (req, res) => {
+    try {
+      const userId = Number(req.params.id);
+
+      if (Number.isNaN(userId)) {
+        return res.status(404).render("errors/404", {
+          message: "Usuario no encontrado",
+        });
+      }
+
+      const targetUser = await prisma.user.findUnique({
+        where: { id: userId },
+        include: { role: true },
+      });
+
+      if (!targetUser) {
+        return res.status(404).render("errors/404", {
+          message: "Usuario no encontrado",
+        });
+      }
+
+      return res.render("users/show", {
+        user: req.user,
+        csrfToken: req.csrfToken(),
+        targetUser,
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).render("errors/500", {
+        message: "Error cargando detalle del usuario",
       });
     }
   }
