@@ -6,7 +6,9 @@ import { logEvent } from "../services/audit.service.js";
 import { getRequestInfo } from "../middlewares/audit.middleware.js";
 
 const MAX_ATTEMPTS = 5;
-const LOCK_TIME = 5 * 60 * 1000; // 5 minutos
+const LOCK_TIME = 5 * 60 * 1000;
+
+const isProduction = process.env.NODE_ENV === "production";
 
 export const login = async (req, res) => {
   const { email, password } = req.body;
@@ -39,10 +41,7 @@ export const login = async (req, res) => {
     if (user.lockUntil && user.lockUntil < new Date()) {
       await prisma.user.update({
         where: { id: user.id },
-        data: {
-          lockUntil: null,
-          failedAttempts: 0,
-        },
+        data: { lockUntil: null, failedAttempts: 0 },
       });
 
       user.lockUntil = null;
@@ -65,9 +64,7 @@ export const login = async (req, res) => {
         });
       }
 
-      return res.status(403).json({
-        error: "Cuenta bloqueada. Intenta más tarde.",
-      });
+      return res.status(403).json({ error: "Cuenta bloqueada" });
     }
 
     const valid = await comparePassword(password, user.password);
@@ -75,9 +72,7 @@ export const login = async (req, res) => {
     if (!valid) {
       const attempts = (user.failedAttempts || 0) + 1;
 
-      const updateData = {
-        failedAttempts: attempts,
-      };
+      const updateData = { failedAttempts: attempts };
 
       if (attempts >= MAX_ATTEMPTS) {
         updateData.lockUntil = new Date(Date.now() + LOCK_TIME);
@@ -122,14 +117,15 @@ export const login = async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
-      maxAge: 60 * 60 * 1000, // 1 hora
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+      maxAge: 60 * 60 * 1000,
     });
 
     res.cookie("lastActivity", Date.now(), {
       httpOnly: true,
-      sameSite: "lax",
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
     });
 
     await logEvent({
@@ -151,13 +147,14 @@ export const login = async (req, res) => {
         role: user.role.name,
       },
     });
+
   } catch (error) {
     console.error(error);
 
     if (req.isWeb) {
       return res.status(500).render("auth/login", {
         csrfToken: req.csrfToken?.(),
-        error: "Error interno al iniciar sesión",
+        error: "Error interno",
       });
     }
 
