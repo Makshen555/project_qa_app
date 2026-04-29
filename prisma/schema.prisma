@@ -1,0 +1,84 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RoleName {
+  SUPERADMIN
+  AUDITOR
+  REGISTRADOR
+}
+
+enum AuditAction {
+  LOGIN_SUCCESS
+  LOGIN_FAIL
+  LOGOUT
+
+  CREATE_USER
+  UPDATE_USER
+  DELETE_USER
+
+  CREATE_PRODUCT
+  UPDATE_PRODUCT
+  DELETE_PRODUCT
+
+  ROLE_CHANGE
+
+  ACCESS_DENIED
+}
+
+model Role {
+  id    Int      @id @default(autoincrement())
+  name  RoleName @unique
+
+  users User[]
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  username   String   @unique
+  email      String   @unique
+  password   String
+  roleId     Int
+  role       Role     @relation(fields: [roleId], references: [id])
+
+  lastLogin  DateTime?
+  createdAt  DateTime @default(now())
+
+  failedAttempts Int      @default(0)
+  lockUntil      DateTime?
+
+  logs       AuditLog[]
+}
+model Product {
+  id          Int      @id @default(autoincrement())
+  code        String   @unique
+  name        String
+  description String
+  quantity    Int
+  price       Float
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AuditLog {
+  id         Int         @id @default(autoincrement())
+
+  userId     Int?
+  user       User?       @relation(fields: [userId], references: [id])
+
+  action     AuditAction
+  entity     String
+  entityId   Int?
+
+  ipAddress  String
+  details    String?
+
+  createdAt  DateTime    @default(now())
+}
